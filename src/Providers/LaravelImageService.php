@@ -2,7 +2,7 @@
 
 use Illuminate\Support\AggregateServiceProvider;
 
-class LaravelGovernorService extends AggregateServiceProvider
+class LaravelImageService extends AggregateServiceProvider
 {
     protected $defer = false;
     protected $providers = [

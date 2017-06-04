@@ -1,0 +1,43 @@
+{
+  "name": "genealabs/laravel-image",
+  "description": "Serve optimize images for faster page loads.",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "GeneaLabs, LLC",
+      "email": "hello@genealabs.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0",
+  },
+  "require-dev": {
+      "doctrine/dbal": "^2.5",
+      "fzaninotto/faker": "~1.4",
+      "jakub-onderka/php-parallel-lint": "0.9.*",
+      "laravel/laravel": "5.4.*",
+      "mockery/mockery": "0.9.*",
+      "pdepend/pdepend": "^2.2",
+      "phploc/phploc": "^3.0",
+      "phpmd/phpmd": "^2.4",
+      "phpunit/phpunit": "~5.0",
+      "sebastian/phpcpd": "^2.0",
+      "squizlabs/php_codesniffer": "^2.7",
+      "symfony/css-selector": "3.2.*",
+      "symfony/dom-crawler": "3.2.*"
+  },
+  "autoload": {
+    "classmap": [
+      "database/migrations",
+      "database/seeds"
+    ],
+    "psr-4": {
+      "GeneaLabs\\LaravelImage\\": "src/",
+      "GeneaLabs\\LaravelImage\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "preferred-install": "dist"
+  }
+}
+

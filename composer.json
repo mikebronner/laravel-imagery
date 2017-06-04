@@ -28,8 +28,6 @@
   },
   "autoload": {
     "classmap": [
-      "database/migrations",
-      "database/seeds"
     ],
     "psr-4": {
       "GeneaLabs\\LaravelImage\\": "src/",

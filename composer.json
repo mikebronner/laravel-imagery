@@ -9,7 +9,7 @@
     }
   ],
   "require": {
-    "php": ">=7.0.0",
+    "php": ">=7.0.0"
   },
   "require-dev": {
       "doctrine/dbal": "^2.5",
@@ -40,4 +40,3 @@
     "preferred-install": "dist"
   }
 }
-

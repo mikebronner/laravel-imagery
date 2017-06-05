@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'storage-folder' => '',
+    'storage-folder' => 'imagery-cache/',
 ];

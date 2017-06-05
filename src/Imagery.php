@@ -71,6 +71,12 @@ class Imagery extends Model
         return "{$fileName}{$extension}";
     }
 
+    public function getImgAttribute() : string
+    {
+        //TODO: implement img tag rendering.
+        return 'render img tag here';
+    }
+
     public function getOriginalUrlAttribute() : string
     {
         return asset(config('storage-folder') . $this->fileName);
@@ -79,6 +85,12 @@ class Imagery extends Model
     public function getPathAttribute() : string
     {
         return public_path(config('storage-folder') . $this->fileName);
+    }
+
+    public function getPictureAttribute() : string
+    {
+        //TODO: implement picture tag rendering.
+        return 'render picture tag here';
     }
 
     public function getUrlAttribute() : string

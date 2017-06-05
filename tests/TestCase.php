@@ -1,4 +1,4 @@
-<?php namespace GeneaLabs\LaravelImage\Tests;
+<?php namespace GeneaLabs\LaravelImagery\Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 

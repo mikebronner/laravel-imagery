@@ -1,6 +1,6 @@
-<?php namespace GeneaLabs\LaravelImage\Tests;
+<?php namespace GeneaLabs\LaravelImagery\Tests;
 
-use GeneaLabs\LaravelImage\Providers\LaravelImageService;
+use GeneaLabs\LaravelImagery\Providers\LaravelImageService;
 use Illuminate\Contracts\Console\Kernel;
 
 trait CreatesApplication
@@ -10,7 +10,13 @@ trait CreatesApplication
         $app = require(__DIR__ . '/../vendor/laravel/laravel/bootstrap/app.php');
         $app->make(Kernel::class)->bootstrap();
         $app->register(LaravelImageService::class);
+        $this->addTestImage();
 
         return $app;
+    }
+
+    protected function addTestImage()
+    {
+        copy(__DIR__ . '/assets/test.jpg', public_path('test.jpg'));
     }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "genealabs/laravel-image",
+  "name": "genealabs/laravel-imagery",
   "description": "Serve optimize images for faster page loads.",
   "license": "MIT",
   "authors": [
@@ -9,7 +9,10 @@
     }
   ],
   "require": {
-    "php": ">=7.0.0"
+    "php": ">=7.0.0",
+    "jenssegers/model": "^1.1",
+    "intervention/image": "^2.3",
+    "intervention/imagecache": "^2.3"
   },
   "require-dev": {
       "doctrine/dbal": "^2.5",
@@ -30,8 +33,8 @@
     "classmap": [
     ],
     "psr-4": {
-      "GeneaLabs\\LaravelImage\\": "src/",
-      "GeneaLabs\\LaravelImage\\Tests\\": "tests/"
+      "GeneaLabs\\LaravelImagery\\": "src/",
+      "GeneaLabs\\LaravelImagery\\Tests\\": "tests/"
     }
   },
   "config": {

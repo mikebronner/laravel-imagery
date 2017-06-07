@@ -31,6 +31,17 @@ There are some online third-party services out there that can handle this. But
   php artisan imagery:publish --assets
   ```
 
+## Usage
+### Options
+### screenConstraintMethod
+**Return type: string, options: 'cover|contain', default: cover.**
+Determine how screen sizing constraints work. Just like the CSS `background-size`
+ properties.
+
+### overrideScreenConstraint
+**Return type: bool, default: false**
+Allows overriding of constraining image to screen dimensions.
+
 ## Planned Features
 - Detects visitor's screen dimensions and optimizes the image for it.
 - Your images don't have to be in a public folder to be served, imagery creates

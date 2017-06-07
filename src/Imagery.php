@@ -7,23 +7,27 @@ class Imagery extends Model
 {
     protected function resizeImage()
     {
-        // TODO: adjust according to screensize.
-        dump(cookie('screenHeight'), $_COOKIE['screenHeight']);
+        $maxHeight = $this->height ?: $this->image->height();
+        $maxWidth = $this->width ?: $this->image->width();
+        //TODO: figure out how to access unencrypted cookies using Laravel
+        $screenHeight = $_COOKIE['screenHeight'];
+        $screenWidth = $_COOKIE['screenWidth'];
 
-        if ($this->width && $this->height) {
-            $this->image->resize($this->width, $this->height);
-            return;
+        if (! $this->overrideScreenConstraint) {
+            $maxHeight = $screenHeight < $maxHeight ? $screenHeight : $maxHeight;
+            $maxWidth = $screenWidth < $maxWidth ? $screenWidth : $maxWidth;
         }
 
-        if ($this->width) {
-            $this->image->widen($this->width);
-            return;
-        }
+        $this->image->resize($maxWidth, $maxHeight, function ($constraint) {
+            if (! $this->width || ! $this->height) {
+                $constraint->aspectRatio();
+            }
 
-        if ($this->height) {
-            $this->image->heighten($this->height);
-            return;
-        }
+            $constraint->upsize();
+        });
+
+        $this->height = $this->image->height();
+        $this->width = $this->image->width();
     }
 
     protected function sourceIsUrl() : bool
@@ -38,20 +42,22 @@ class Imagery extends Model
         array $htmlAttributes = [],
         array $options = []
     ) : self {
+        $htmlAttributes = collect($htmlAttributes);
+        $options = collect($options);
         $this->height = $height;
         $this->image = (new ImageManager)->make($source);
         $this->source = $source;
         $this->width = $width;
         $this->originalPath = public_path(config('storage-folder') . $this->fileName);
+        $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
+        $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'cover');
 
         if ($this->sourceIsUrl($source)) {
             $this->image->save($this->originalPath);
         }
 
-        // if ($width || $height) {
-            $this->resizeImage();
-            $this->image->save(public_path(config('storage-folder') . "{$this->fileName}"));
-        // }
+        $this->resizeImage();
+        $this->image->save(public_path(config('storage-folder') . "{$this->fileName}"));
 
         // TODO: queue up image compression to run in background.
 
@@ -67,16 +73,21 @@ class Imagery extends Model
             $fileName .= "_{$this->image->width()}x{$this->image->height()}";
         }
 
-        $extension = $this->image->extension ? ".{$this->image->extension}" : '';
+        $extension = $this->image->extension ?: '';
 
-        return "{$fileName}{$extension}";
+        if (! $extension) {
+            $extension = collect(explode('/', $this->image->mime()))->last();
+        }
+
+        return "{$fileName}.{$extension}";
     }
 
     public function getImgAttribute() : string
     {
         //TODO: implement img tag attributes, move script to middleware injector
         $scriptUrl = mix('js/cookie.js', 'genealabs-laravel-imagery');
-        return "<img src=\"{$this->url}\"><script src=\"{$scriptUrl}\"></script>";
+
+        return "<img src=\"{$this->url}\" width=\"{$this->width}\" height=\"{$this->height}\"><script src=\"{$scriptUrl}\"></script>";
     }
 
     public function getOriginalUrlAttribute() : string

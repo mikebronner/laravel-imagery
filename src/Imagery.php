@@ -7,13 +7,15 @@ class Imagery extends Model
 {
     protected function resizeImage(int $width = null, int $height = null, bool $alwaysPreserveAspectRatio = null)
     {
-
         //TODO: refactor this method
-        $maxHeight = $this->originalHeight ?: $this->originalHeight;
-        $maxWidth = $this->originalWidth ?: $this->originalWidth;
+        // dump($this->originalWidth, $this->originalHeight);
+        // $this->image->resize($this->originalWidth, $this->originalHeight);
+        $maxHeight = $height ?: $this->originalHeight;
+        $maxWidth = $width ?: $this->originalWidth;
         //TODO: figure out how to access unencrypted cookies using Laravel
         $screenHeight = $_COOKIE['screenHeight'];
         $screenWidth = $_COOKIE['screenWidth'];
+        $image = $this->image;
 
         if (! $this->overrideScreenConstraint) {
             $maxHeight = $screenHeight < $maxHeight ? $screenHeight : $maxHeight;
@@ -68,6 +70,7 @@ class Imagery extends Model
         $this->originalHeight = $this->image->height();
         $this->originalWidth = $this->image->width();
         $this->originalPath = public_path(config('storage-folder') . $this->fileName);
+        $this->alwaysPreserveAspectRatio = $options->get('alwaysPreserveAspectRatio', true);
         $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
         $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'contain');
 
@@ -76,7 +79,7 @@ class Imagery extends Model
         }
 
         $this->createPresetImageSizes();
-        $this->resizeImage($width, $height);
+        $this->resizeImage($width, $height, $this->alwaysPreserveAspectRatio);
 
         // TODO: queue up image compression to run in background.
 
@@ -85,9 +88,10 @@ class Imagery extends Model
 
     protected function createPresetImageSizes()
     {
-        foreach (config('genealabs-laravel-imagery.size-presets') as $sizePreset) {
-            $this->resizeImage($sizePreset, $sizePreset, true);
-        }
+        //TODO: move to queue
+        // foreach (config('genealabs-laravel-imagery.size-presets') as $sizePreset) {
+        //     $this->resizeImage($sizePreset, $sizePreset, true);
+        // }
     }
 
     protected function storeImage()

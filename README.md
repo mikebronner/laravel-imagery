@@ -34,9 +34,11 @@ There are some online third-party services out there that can handle this. But
 ## Usage
 ### Options
 ### screenConstraintMethod
-**Return type: string, options: 'cover|contain', default: cover.**
+**Return type: string, options: 'contain|cover', default: contain.**
 Determine how screen sizing constraints work. Just like the CSS `background-size`
- properties.
+ properties. `cover` will try to size the image to fill the boundaries of the size
+ provided (or if not provided, use the screen size), while `contain` will size
+ the image to fit within those bounds.
 
 ### overrideScreenConstraint
 **Return type: bool, default: false**

@@ -16,6 +16,17 @@ class Imagery extends Model
         if (! $this->overrideScreenConstraint) {
             $maxHeight = $screenHeight < $maxHeight ? $screenHeight : $maxHeight;
             $maxWidth = $screenWidth < $maxWidth ? $screenWidth : $maxWidth;
+
+            if ($this->screenConstraintMethod === 'cover') {
+                $imageToScreenHeightRatio = $screenHeight / $this->image->height();
+                $imageToScreenWidthRatio = $screenWidth / $this->image->width();
+
+                if ($imageToScreenHeightRatio > $imageToScreenWidthRatio) {
+                    $maxWidth = null;
+                } else {
+                    $maxHeight = null;
+                }
+            }
         }
 
         $this->image->resize($maxWidth, $maxHeight, function ($constraint) {
@@ -50,7 +61,7 @@ class Imagery extends Model
         $this->width = $width;
         $this->originalPath = public_path(config('storage-folder') . $this->fileName);
         $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
-        $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'cover');
+        $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'contain');
 
         if ($this->sourceIsUrl($source)) {
             $this->image->save($this->originalPath);

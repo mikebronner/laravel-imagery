@@ -8,6 +8,7 @@ class Imagery extends Model
     protected function resizeImage()
     {
         // TODO: adjust according to screensize.
+        dump(cookie('screenHeight'), $_COOKIE['screenHeight']);
 
         if ($this->width && $this->height) {
             $this->image->resize($this->width, $this->height);
@@ -47,10 +48,10 @@ class Imagery extends Model
             $this->image->save($this->originalPath);
         }
 
-        if ($width || $height) {
+        // if ($width || $height) {
             $this->resizeImage();
             $this->image->save(public_path(config('storage-folder') . "{$this->fileName}"));
-        }
+        // }
 
         // TODO: queue up image compression to run in background.
 
@@ -73,8 +74,9 @@ class Imagery extends Model
 
     public function getImgAttribute() : string
     {
-        //TODO: implement img tag rendering.
-        return 'render img tag here';
+        //TODO: implement img tag attributes, move script to middleware injector
+        $scriptUrl = mix('js/cookie.js', 'genealabs-laravel-imagery');
+        return "<img src=\"{$this->url}\"><script src=\"{$scriptUrl}\"></script>";
     }
 
     public function getOriginalUrlAttribute() : string

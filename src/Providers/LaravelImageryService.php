@@ -1,15 +1,15 @@
 <?php namespace GeneaLabs\LaravelImagery\Providers;
 
 use GeneaLabs\LaravelImagery\Imagery;
+use GeneaLabs\LaravelImagery\Console\Commands\Publish;
 use Illuminate\Support\AggregateServiceProvider;
 use Intervention\Image\ImageServiceProvider;
 
-class LaravelImageService extends AggregateServiceProvider
+class LaravelImageryService extends AggregateServiceProvider
 {
     protected $defer = false;
     protected $providers = [
         ImageServiceProvider::class,
-        // Intervention image, etc.
     ];
 
     public function boot()
@@ -21,12 +21,17 @@ class LaravelImageService extends AggregateServiceProvider
             $configPath => config_path('genealabs-laravel-imagery.php')
         ], 'config');
         $this->mergeConfigFrom($configPath, 'genealabs-laravel-imagery');
+
+        $this->publishes([
+            __DIR__ . '/../../public/' => public_path('genealabs-laravel-imagery'),
+        ], 'assets');
     }
 
     public function register()
     {
         parent::register();
 
+        $this->commands(Publish::class);
         $this->app->singleton('imagery', function () {
             return new Imagery();
         });
@@ -46,7 +51,7 @@ class LaravelImageService extends AggregateServiceProvider
         app('blade.compiler')->directive($directive, function ($parameters) {
             $parameters = trim($parameters, "()");
 
-            return "<?php echo app('imagery')->conjure({$parameters}); ?>";
+            return "<?php echo app('imagery')->conjure({$parameters})->img; ?>";
         });
     }
 }

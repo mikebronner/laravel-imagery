@@ -15,6 +15,22 @@ There are some online third-party services out there that can handle this. But
  party vendors? This package aims to fill that gap, and more-over, improve user
  experience in your application by loading assets faster, and at the right sizes.
 
+## Installation
+1. Pull in the package:
+  ```sh
+  composer require genealabs/imagery
+  ```
+
+2. Register the service provider in `\config\app.php`:
+  ```php
+  GeneaLabs\LaravelImagery\Providers\LaravelImageryService::class,
+  ```
+
+3. Publish the assets:
+  ```sh
+  php artisan imagery:publish --assets
+  ```
+
 ## Planned Features
 - Detects visitor's screen dimensions and optimizes the image for it.
 - Your images don't have to be in a public folder to be served, imagery creates

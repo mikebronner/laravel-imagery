@@ -32,6 +32,7 @@ There are some online third-party services out there that can handle this. But
   ```
 
 ## Configuration
+### Settings
 Annotations to be added...
 ```php
 <?php
@@ -47,6 +48,11 @@ return [
     ]
 ];
 ```
+
+### Queue
+It is recommended to set up an async queue driver to process image generation.
+ See https://laravel.com/docs/5.4/queues for more details. Items will be
+ dispatched onto a separate queue called `imagery`.
 
 ## Usage
 ### Options

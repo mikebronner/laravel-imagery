@@ -84,7 +84,8 @@ class Imagery extends Model
         $this->resizeImage($width, $height, $this->alwaysPreserveAspectRatio);
 
         if (! $this->doNotCreateDerivativeImages) {
-            dispatch(new RenderDerivativeImages($this->originalPath));
+            dispatch(new RenderDerivativeImages($this->originalPath))
+                ->onQueue('imagery');
         }
 
         // TODO: queue up image compression to run in background.

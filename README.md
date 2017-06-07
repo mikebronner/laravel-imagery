@@ -50,16 +50,25 @@ return [
 
 ## Usage
 ### Options
-### screenConstraintMethod
+#### alwaysPreserveAspectRatio
+**type: bool, default: true**
+Allow distortion of images if set to false.
+
+#### doNotCreateDerivativeImages
+**type: bool, default: false**
+Prevent Laravel Imagery from automatically creating preset image sizes. This
+ should normally be left on, unless specifically not needed.
+
+#### overrideScreenConstraint
+**type: bool, default: false**
+Allows overriding of constraining image to screen dimensions.
+
+#### screenConstraintMethod
 **type: string, options: 'contain|cover', default: contain.**
 Determine how screen sizing constraints work. Just like the CSS `background-size`
  properties. `cover` will try to size the image to fill the boundaries of the size
  provided (or if not provided, use the screen size), while `contain` will size
  the image to fit within those bounds.
-
-### overrideScreenConstraint
-**type: bool, default: false**
-Allows overriding of constraining image to screen dimensions.
 
 ## Planned Features
 - Detects visitor's screen dimensions and optimizes the image for it.

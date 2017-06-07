@@ -1,5 +1,6 @@
 <?php namespace GeneaLabs\LaravelImagery;
 
+use GeneaLabs\LaravelImagery\Jobs\RenderDerivativeImages;
 use Intervention\Image\ImageManager;
 use Jenssegers\Model\Model;
 
@@ -71,6 +72,7 @@ class Imagery extends Model
         $this->originalWidth = $this->image->width();
         $this->originalPath = public_path(config('storage-folder') . $this->fileName);
         $this->alwaysPreserveAspectRatio = $options->get('alwaysPreserveAspectRatio', true);
+        $this->doNotCreateDerivativeImages = $options->get('doNotCreateDerivativeImages', false);
         $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
         $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'contain');
 
@@ -80,6 +82,10 @@ class Imagery extends Model
 
         $this->createPresetImageSizes();
         $this->resizeImage($width, $height, $this->alwaysPreserveAspectRatio);
+
+        if (! $this->doNotCreateDerivativeImages) {
+            dispatch(new RenderDerivativeImages($this->originalPath));
+        }
 
         // TODO: queue up image compression to run in background.
 

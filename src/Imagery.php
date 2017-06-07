@@ -5,10 +5,12 @@ use Jenssegers\Model\Model;
 
 class Imagery extends Model
 {
-    protected function resizeImage()
+    protected function resizeImage(int $width = null, int $height = null, bool $alwaysPreserveAspectRatio = null)
     {
-        $maxHeight = $this->height ?: $this->image->height();
-        $maxWidth = $this->width ?: $this->image->width();
+
+        //TODO: refactor this method
+        $maxHeight = $this->originalHeight ?: $this->originalHeight;
+        $maxWidth = $this->originalWidth ?: $this->originalWidth;
         //TODO: figure out how to access unencrypted cookies using Laravel
         $screenHeight = $_COOKIE['screenHeight'];
         $screenWidth = $_COOKIE['screenWidth'];
@@ -29,8 +31,8 @@ class Imagery extends Model
             }
         }
 
-        $this->image->resize($maxWidth, $maxHeight, function ($constraint) {
-            if (! $this->width || ! $this->height) {
+        $this->image->resize($maxWidth, $maxHeight, function ($constraint) use ($alwaysPreserveAspectRatio) {
+            if ($alwaysPreserveAspectRatio || ! $this->originalWidth || ! $this->originalHeight) {
                 $constraint->aspectRatio();
             }
 
@@ -39,6 +41,7 @@ class Imagery extends Model
 
         $this->height = $this->image->height();
         $this->width = $this->image->width();
+        $this->storeImage();
     }
 
     protected function sourceIsUrl() : bool
@@ -53,12 +56,17 @@ class Imagery extends Model
         array $htmlAttributes = [],
         array $options = []
     ) : self {
+        //TODO: implement dynamic parameters to allow multiple signatures:
+        // 1: conjure(source, preset, htmlAttributes, options)
+        // 2: congure(source, width, height, htmlAttributes, options)
         $htmlAttributes = collect($htmlAttributes);
         $options = collect($options);
         $this->height = $height;
         $this->image = (new ImageManager)->make($source);
         $this->source = $source;
         $this->width = $width;
+        $this->originalHeight = $this->image->height();
+        $this->originalWidth = $this->image->width();
         $this->originalPath = public_path(config('storage-folder') . $this->fileName);
         $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
         $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'contain');
@@ -67,12 +75,24 @@ class Imagery extends Model
             $this->image->save($this->originalPath);
         }
 
-        $this->resizeImage();
-        $this->image->save(public_path(config('storage-folder') . "{$this->fileName}"));
+        $this->createPresetImageSizes();
+        $this->resizeImage($width, $height);
 
         // TODO: queue up image compression to run in background.
 
         return $this;
+    }
+
+    protected function createPresetImageSizes()
+    {
+        foreach (config('genealabs-laravel-imagery.size-presets') as $sizePreset) {
+            $this->resizeImage($sizePreset, $sizePreset, true);
+        }
+    }
+
+    protected function storeImage()
+    {
+        $this->image->save(public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName));
     }
 
     public function getFileNameAttribute() : string
@@ -119,6 +139,6 @@ class Imagery extends Model
 
     public function getUrlAttribute() : string
     {
-        return asset(config('storage-folder') . $this->fileName);
+        return asset(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
     }
 }

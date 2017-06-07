@@ -31,17 +31,34 @@ There are some online third-party services out there that can handle this. But
   php artisan imagery:publish --assets
   ```
 
+## Configuration
+Annotations to be added...
+```php
+<?php
+
+return [
+    'storage-folder' => 'imagery-cache/',
+    'size-presets' => [
+        'thumbnail' => 150,
+        'extra-small' => 480,
+        'small' => 768,
+        'medium' => 992,
+        'large' => 1200,
+    ]
+];
+```
+
 ## Usage
 ### Options
 ### screenConstraintMethod
-**Return type: string, options: 'contain|cover', default: contain.**
+**type: string, options: 'contain|cover', default: contain.**
 Determine how screen sizing constraints work. Just like the CSS `background-size`
  properties. `cover` will try to size the image to fill the boundaries of the size
  provided (or if not provided, use the screen size), while `contain` will size
  the image to fit within those bounds.
 
 ### overrideScreenConstraint
-**Return type: bool, default: false**
+**type: bool, default: false**
 Allows overriding of constraining image to screen dimensions.
 
 ## Planned Features

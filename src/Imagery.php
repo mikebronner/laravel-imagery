@@ -9,14 +9,11 @@ class Imagery extends Model
     protected function resizeImage(int $width = null, int $height = null, bool $alwaysPreserveAspectRatio = null)
     {
         //TODO: refactor this method
-        // dump($this->originalWidth, $this->originalHeight);
-        // $this->image->resize($this->originalWidth, $this->originalHeight);
         $maxHeight = $height ?: $this->originalHeight;
         $maxWidth = $width ?: $this->originalWidth;
         //TODO: figure out how to access unencrypted cookies using Laravel
         $screenHeight = $_COOKIE['screenHeight'];
         $screenWidth = $_COOKIE['screenWidth'];
-        $image = $this->image;
 
         if (! $this->overrideScreenConstraint) {
             $maxHeight = $screenHeight < $maxHeight ? $screenHeight : $maxHeight;
@@ -59,29 +56,36 @@ class Imagery extends Model
         array $htmlAttributes = [],
         array $options = []
     ) : self {
-        //TODO: implement dynamic parameters to allow multiple signatures:
-        // 1: conjure(source, preset, htmlAttributes, options)
-        // 2: congure(source, width, height, htmlAttributes, options)
         $htmlAttributes = collect($htmlAttributes);
         $options = collect($options);
         $this->height = $height;
-        $this->image = (new ImageManager)->make($source);
         $this->source = $source;
         $this->width = $width;
-        $this->originalHeight = $this->image->height();
-        $this->originalWidth = $this->image->width();
         $this->originalPath = public_path(config('storage-folder') . $this->fileName);
         $this->alwaysPreserveAspectRatio = $options->get('alwaysPreserveAspectRatio', true);
         $this->doNotCreateDerivativeImages = $options->get('doNotCreateDerivativeImages', false);
         $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
         $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'contain');
 
+        $this->image = cache()->forever("{$source}-{$width}-{$height}-{$this->alwaysPreserveAspectRatio}-{$this->overrideScreenConstraint}-{$this->screenConstraintMethod}", function () {
+//TODO: serialization of closure not allowed
+            return $this->loadImage();
+        });
+
+        return $this;
+    }
+
+    protected function loadImage() : Imagery
+    {
+        $image = (new ImageManager)->make($source);
+        $this->originalHeight = $image->height();
+        $this->originalWidth = $image->width();
+
         if ($this->sourceIsUrl($source)) {
-            $this->image->save($this->originalPath);
+            $image->save($this->originalPath);
         }
 
-        $this->createPresetImageSizes();
-        $this->resizeImage($width, $height, $this->alwaysPreserveAspectRatio);
+        $this->resizeImage($this->width, $this->height, $this->alwaysPreserveAspectRatio);
 
         if (! $this->doNotCreateDerivativeImages) {
             dispatch(new RenderDerivativeImages($this->originalPath))
@@ -90,15 +94,7 @@ class Imagery extends Model
 
         // TODO: queue up image compression to run in background.
 
-        return $this;
-    }
-
-    protected function createPresetImageSizes()
-    {
-        //TODO: move to queue
-        // foreach (config('genealabs-laravel-imagery.size-presets') as $sizePreset) {
-        //     $this->resizeImage($sizePreset, $sizePreset, true);
-        // }
+        return $image;
     }
 
     protected function storeImage()
@@ -112,14 +108,16 @@ class Imagery extends Model
         $fileName = $pathParts['filename'];
 
         if ($this->width || $this->height) {
-            $fileName .= "_{$this->image->width()}x{$this->image->height()}";
+            $fileName .= "_{$this->width}x{$this->height}";
         }
 
-        $extension = $this->image->extension ?: '';
-
-        if (! $extension) {
-            $extension = collect(explode('/', $this->image->mime()))->last();
-        }
+//TODO: fix reference to $this->image, doesn't exist yet at this point
+$extension = '';
+        // $extension = $this->image->extension ?: '';
+        //
+        // if (! $extension) {
+        //     $extension = collect(explode('/', $this->image->mime()))->last();
+        // }
 
         return "{$fileName}.{$extension}";
     }

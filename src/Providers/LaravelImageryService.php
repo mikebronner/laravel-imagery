@@ -51,7 +51,7 @@ class LaravelImageryService extends AggregateServiceProvider
         app('blade.compiler')->directive($directive, function ($parameters) {
             $parameters = trim($parameters, "()");
 
-            return "<?php echo app('imagery')->conjure({$parameters})->img; ?>";
+            return "<?php echo app('imagery')->conjure({$parameters})->picture; ?>";
         });
     }
 }

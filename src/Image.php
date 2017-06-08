@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 
 class Image extends Model
 {
+    //TODO: this class needs serious refactoring!!!
     public function __construct(
         string $source,
         int $width = null,
@@ -18,7 +19,7 @@ class Image extends Model
         $this->height = $height;
         $this->source = $source;
         $this->width = $width;
-        $this->originalPath = public_path(config('storage-folder') . $this->fileName);
+        $this->originalPath = public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
         $this->alwaysPreserveAspectRatio = $options->get('alwaysPreserveAspectRatio', true);
         $this->doNotCreateDerivativeImages = $options->get('doNotCreateDerivativeImages', false);
         $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
@@ -128,8 +129,25 @@ $extension = '';
 
     public function getPictureAttribute() : string
     {
-        //TODO: implement picture tag rendering.
-        return 'render picture tag here';
+        //TODO: implement img tag attributes, move script to middleware injector
+        $scriptUrl = mix('js/cookie.js', 'genealabs-laravel-imagery');
+        $sources = '';
+
+        foreach (array_reverse(config('genealabs-laravel-imagery.size-presets')) as $sizePreset) {
+            $image = ((new Imagery)->conjure($this->source, $sizePreset, $sizePreset, [], ['doNotCreateDerivativeImages' => true]));
+
+            if ($sizePreset < $this->width || $sizePreset < $this->height) {
+                $sources .= "<source srcset=\"{$image->url}\" media=\"(min-width: {$sizePreset}px)\">";
+            }
+        }
+
+        return "
+            <picture>
+                {$sources}
+                <img src=\"{$this->url}\">
+            </picture>
+            <script src=\"{$scriptUrl}\"></script>
+        ";
     }
 
     public function getUrlAttribute() : string

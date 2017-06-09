@@ -17,6 +17,8 @@ class Image extends Model
     ) {
         parent::__construct();
 
+        $this->createChacheFolderIfMissing();
+
         $this->originalHeight = $height;
         $this->originalWidth = $width;
         $this->htmlAttributes = $htmlAttributes;
@@ -122,13 +124,12 @@ class Image extends Model
 
     public function getImgAttribute() : string
     {
-        //TODO: implement img tag attributes, move script to middleware injector
         $scriptUrl = mix('js/cookie.js', 'genealabs-laravel-imagery');
         $attributes = '';
 
-        foreach ($this->htmlAttributes as $attribute => $value) {
-            $attributes .= " {$attribute}=\"{$value}\"";
-        }
+        $attributes = $this->htmlAttributes->map(function ($value, $attribute) use (&$attributes) {
+            return " {$attribute}=\"{$value}\"";
+        })->implode('');
 
         return "<img src=\"{$this->url}\"
             width=\"{$this->originalWidth}\"
@@ -172,5 +173,17 @@ class Image extends Model
     public function getUrlAttribute() : string
     {
         return asset(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
+    }
+
+    protected function createChacheFolderIfMissing()
+    {
+        app('filesystem')->disk('public')->makeDirectory(config('genealabs-laravel-imagery.storage-folder'));
+
+        if (! file_exists(public_path(config('genealabs-laravel-imagery.storage-folder')))) {
+            symlink(
+                rtrim(storage_path('app/public/' . config('genealabs-laravel-imagery.storage-folder')), '/'),
+                rtrim(public_path(config('genealabs-laravel-imagery.storage-folder')), '/')
+            );
+        }
     }
 }

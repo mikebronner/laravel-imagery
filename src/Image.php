@@ -19,11 +19,13 @@ class Image extends Model
 
         $this->originalHeight = $height;
         $this->originalWidth = $width;
+        $this->htmlAttributes = $htmlAttributes;
         $this->heightIsPercentage = str_contains($height, '%');
         $this->widthIsPercentage = str_contains($width, '%');
         $this->height = intval($height);
         $this->width = intval($width);
         $this->source = $source;
+        $this->image = (new ImageManager)->make($source);
         $this->originalPath = public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
         $this->alwaysPreserveAspectRatio = $options->get('alwaysPreserveAspectRatio', true);
         $this->doNotCreateDerivativeImages = $options->get('doNotCreateDerivativeImages', false);
@@ -31,7 +33,6 @@ class Image extends Model
         $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'contain');
         // TODO: queue up image compression to run in background.
 
-        $this->image = (new ImageManager)->make($source);
 
         if ($this->sourceIsUrl($source)) {
             $this->image->save($this->originalPath);
@@ -106,18 +107,15 @@ class Image extends Model
     {
         $pathParts = pathinfo($this->source);
         $fileName = $pathParts['filename'];
+        $extension = $this->image->extension ?: '';
 
         if ($this->width || $this->height) {
             $fileName .= "_{$this->width}x{$this->height}";
         }
 
-//TODO: fix reference to $this->image, doesn't exist yet at this point
-$extension = '';
-        // $extension = $this->image->extension ?: '';
-        //
-        // if (! $extension) {
-        //     $extension = collect(explode('/', $this->image->mime()))->last();
-        // }
+        if (! $extension) {
+            $extension = collect(explode('/', $this->image->mime()))->last();
+        }
 
         return "{$fileName}.{$extension}";
     }
@@ -126,8 +124,16 @@ $extension = '';
     {
         //TODO: implement img tag attributes, move script to middleware injector
         $scriptUrl = mix('js/cookie.js', 'genealabs-laravel-imagery');
+        $attributes = '';
 
-        return "<img src=\"{$this->url}\" width=\"{$this->originalWidth}\" height=\"{$this->originalHeight}\"><script src=\"{$scriptUrl}\"></script>";
+        foreach ($this->htmlAttributes as $attribute => $value) {
+            $attributes .= " {$attribute}=\"{$value}\"";
+        }
+
+        return "<img src=\"{$this->url}\"
+            width=\"{$this->originalWidth}\"
+            height=\"{$this->originalHeight}\"{{ $attributes }}
+        ><script src=\"{$scriptUrl}\"></script>";
     }
 
     public function getOriginalUrlAttribute() : string

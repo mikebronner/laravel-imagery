@@ -11,14 +11,14 @@ class Imagery
     ) : Image {
         $options = collect($options);
         $htmlAttributes = collect($htmlAttributes);
-        $keyElements = [
+        $keyElements = collect([
             $source,
             $width,
             $height,
             $options->get('alwaysPreserveAspectRatio', true),
             $options->get('overrideScreenConstraint', false),
             $options->get('screenConstraintMethod', 'contain'),
-        ];
+        ])->concat($htmlAttributes)->toArray();
 
         return  cache()->remember(
             implode('-', $keyElements),

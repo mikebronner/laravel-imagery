@@ -14,7 +14,8 @@ class LaravelImageryService extends AggregateServiceProvider
 
     public function boot()
     {
-        $this->registerBladeDirective('imagery');
+        $this->registerBladeDirective('imageryImg', 'img');
+        $this->registerBladeDirective('imageryPicture', 'picture');
 
         $configPath = __DIR__ . '/../../config/genealabs-laravel-imagery.php';
         $this->publishes([
@@ -42,16 +43,16 @@ class LaravelImageryService extends AggregateServiceProvider
         return ['genealabs-laravel-imagery'];
     }
 
-    protected function registerBladeDirective($directive)
+    protected function registerBladeDirective(string $directive, string $type)
     {
         if (array_key_exists($directive, app('blade.compiler')->getCustomDirectives())) {
             throw new Exception("Blade directive '{$directive}' is already registered.");
         }
 
-        app('blade.compiler')->directive($directive, function ($parameters) {
+        app('blade.compiler')->directive($directive, function ($parameters) use ($type) {
             $parameters = trim($parameters, "()");
 
-            return "<?php echo app('imagery')->conjure({$parameters})->picture; ?>";
+            return "<?php echo app('imagery')->conjure({$parameters})->{$type}; ?>";
         });
     }
 }

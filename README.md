@@ -55,6 +55,13 @@ It is recommended to set up an async queue driver to process image generation.
  dispatched onto a separate queue called `imagery`.
 
 ## Usage
+### Blade
+#### `@imageryImg`
+Outputs an `<img src="..." width="..." height="...">` tag.
+
+#### `@imageryPicture`
+Outputs a multi-resolution, responsive `<picture>` tag.
+
 ### Options
 #### alwaysPreserveAspectRatio
 **type: bool, default: true**

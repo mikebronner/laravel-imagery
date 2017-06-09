@@ -4,8 +4,8 @@ class Imagery
 {
     public function conjure(
         string $source,
-        int $width = null,
-        int $height = null,
+        string $width = null,
+        string $height = null,
         array $htmlAttributes = [],
         array $options = []
     ) : Image {

@@ -10,15 +10,20 @@ class Image extends Model
     //TODO: this class needs serious refactoring!!!
     public function __construct(
         string $source,
-        int $width = null,
-        int $height = null,
+        string $width = null,
+        string $height = null,
         Collection $htmlAttributes = null,
         Collection $options = null
     ) {
         parent::__construct();
-        $this->height = $height;
+
+        $this->originalHeight = $height;
+        $this->originalWidth = $width;
+        $this->heightIsPercentage = str_contains($height, '%');
+        $this->widthIsPercentage = str_contains($width, '%');
+        $this->height = intval($height);
+        $this->width = intval($width);
         $this->source = $source;
-        $this->width = $width;
         $this->originalPath = public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
         $this->alwaysPreserveAspectRatio = $options->get('alwaysPreserveAspectRatio', true);
         $this->doNotCreateDerivativeImages = $options->get('doNotCreateDerivativeImages', false);
@@ -42,12 +47,20 @@ class Image extends Model
 
     protected function resizeImage(int $width = null, int $height = null, bool $alwaysPreserveAspectRatio = null)
     {
-        //TODO: refactor this method
+        $screenHeight = $_COOKIE['screenHeight'];
+        $screenWidth = $_COOKIE['screenWidth'];
+
+        if ($screenHeight && $height && $this->heightIsPercentage) {
+            $height = $screenHeight * ($height / 100);
+        }
+
+        if ($screenWidth && $width && $this->widthIsPercentage) {
+            $width = $screenWidth * ($width / 100);
+        }
+
         $maxHeight = $height ?: $this->image->height();
         $maxWidth = $width ?: $this->image->width();
         //TODO: figure out how to access unencrypted cookies using Laravel
-        $screenHeight = $_COOKIE['screenHeight'];
-        $screenWidth = $_COOKIE['screenWidth'];
 
         if (! $this->overrideScreenConstraint) {
             $maxHeight = $screenHeight < $maxHeight ? $screenHeight : $maxHeight;
@@ -114,7 +127,7 @@ $extension = '';
         //TODO: implement img tag attributes, move script to middleware injector
         $scriptUrl = mix('js/cookie.js', 'genealabs-laravel-imagery');
 
-        return "<img src=\"{$this->url}\" width=\"{$this->width}\" height=\"{$this->height}\"><script src=\"{$scriptUrl}\"></script>";
+        return "<img src=\"{$this->url}\" width=\"{$this->originalWidth}\" height=\"{$this->originalHeight}\"><script src=\"{$scriptUrl}\"></script>";
     }
 
     public function getOriginalUrlAttribute() : string

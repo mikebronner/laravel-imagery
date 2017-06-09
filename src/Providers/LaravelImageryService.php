@@ -1,6 +1,7 @@
 <?php namespace GeneaLabs\LaravelImagery\Providers;
 
 use GeneaLabs\LaravelImagery\Imagery;
+use GeneaLabs\LaravelImagery\Console\Commands\Clear;
 use GeneaLabs\LaravelImagery\Console\Commands\Publish;
 use Illuminate\Support\AggregateServiceProvider;
 use Intervention\Image\ImageServiceProvider;
@@ -32,6 +33,7 @@ class LaravelImageryService extends AggregateServiceProvider
     {
         parent::register();
 
+        $this->commands(Clear::class);
         $this->commands(Publish::class);
         $this->app->singleton('imagery', function () {
             return new Imagery();

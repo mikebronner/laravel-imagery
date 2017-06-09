@@ -109,14 +109,10 @@ class Image extends Model
     {
         $pathParts = pathinfo($this->source);
         $fileName = $pathParts['filename'];
-        $extension = $this->image->extension ?: '';
+        $extension = '.' . $pathParts['extension'];
 
         if ($this->width || $this->height) {
             $fileName .= "_{$this->width}x{$this->height}";
-        }
-
-        if (! $extension) {
-            $extension = collect(explode('/', $this->image->mime()))->last();
         }
 
         return "{$fileName}.{$extension}";

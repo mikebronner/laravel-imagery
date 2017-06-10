@@ -48,41 +48,18 @@ class Image extends Model
         }
     }
 
-    protected function resizeImage(int $width = null, int $height = null, bool $alwaysPreserveAspectRatio = null)
+    protected function resizeImage(int $width = null, int $height = null, bool $alwaysPreserveAspect = null)
     {
+        //TODO: access cookie via Laravel, avoid superglobals.
         $screenHeight = $_COOKIE['screenHeight'];
         $screenWidth = $_COOKIE['screenWidth'];
+        $height = $this->determineHeight($height, $screenHeight);
+        $width = $this->determineWidth($width, $screenWidth);
+        $maxHeight = $this->determineMaxHeight($height, $screenHeight, $screenWidth);
+        $maxWidth = $this->determineMaxWidth($width, $screenHeight, $screenWidth);
 
-        if ($screenHeight && $height && $this->heightIsPercentage) {
-            $height = $screenHeight * ($height / 100);
-        }
-
-        if ($screenWidth && $width && $this->widthIsPercentage) {
-            $width = $screenWidth * ($width / 100);
-        }
-
-        $maxHeight = $height ?: $this->image->height();
-        $maxWidth = $width ?: $this->image->width();
-        //TODO: figure out how to access unencrypted cookies using Laravel
-
-        if (! $this->overrideScreenConstraint) {
-            $maxHeight = $screenHeight < $maxHeight ? $screenHeight : $maxHeight;
-            $maxWidth = $screenWidth < $maxWidth ? $screenWidth : $maxWidth;
-
-            if ($this->screenConstraintMethod === 'cover') {
-                $imageToScreenHeightRatio = $screenHeight / $this->image->height();
-                $imageToScreenWidthRatio = $screenWidth / $this->image->width();
-
-                if ($imageToScreenHeightRatio > $imageToScreenWidthRatio) {
-                    $maxWidth = null;
-                } else {
-                    $maxHeight = null;
-                }
-            }
-        }
-
-        $this->image->resize($maxWidth, $maxHeight, function ($constraint) use ($alwaysPreserveAspectRatio) {
-            if ($alwaysPreserveAspectRatio || ! $this->image->width() || ! $this->image->height()) {
+        $this->image->resize($maxWidth, $maxHeight, function ($constraint) use ($alwaysPreserveAspect) {
+            if ($alwaysPreserveAspect || ! $width || ! $height) {
                 $constraint->aspectRatio();
             }
 
@@ -94,11 +71,66 @@ class Image extends Model
         $this->storeImage();
     }
 
+    protected function determineMaxHeight($height, $screenHeight, $screenWidth)
+    {
+        $maxHeight = $height ?: $this->image->height();
+
+        if (! $this->overrideScreenConstraint) {
+            $maxHeight = $screenHeight < $maxHeight ? $screenHeight : $maxHeight;
+
+            if ($this->screenConstraintMethod === 'cover') {
+                $imageToScreenHeight = $screenHeight / $this->image->height();
+                $imageToScreenWidth = $screenWidth / $this->image->width();
+
+                if ($imageToScreenHeight < $imageToScreenWidth) {
+                    $maxHeight = null;
+                }
+            }
+        }
+
+        return $maxHeight;
+    }
+
+    protected function determineMaxWidth($width, $screenHeight, $screenWidth)
+    {
+        $maxWidth = $width ?: $this->image->width();
+
+        if (! $this->overrideScreenConstraint) {
+            $maxWidth = $screenWidth < $maxWidth ? $screenWidth : $maxWidth;
+
+            if ($this->screenConstraintMethod === 'cover') {
+                $imageToScreenHeight = $screenHeight / $this->image->height();
+                $imageToScreenWidth = $screenWidth / $this->image->width();
+
+                if ($imageToScreenHeight > $imageToScreenWidth) {
+                    $maxWidth = null;
+                }
+            }
+        }
+    }
+
+    protected function determineHeight($height, $screenHeight)
+    {
+        if ($screenHeight && $height && $this->heightIsPercentage) {
+            return $screenHeight * ($height / 100);
+        }
+
+        return $height;
+    }
+
+    protected function determineWidth($width, $screenWidth)
+    {
+        if ($screenWidth && $width && $this->widthIsPercentage) {
+            return $screenWidth * ($width / 100);
+        }
+
+        return $width;
+    }
+
     protected function sourceIsUrl() : bool
     {
         return collect(parse_url($this->source))->has('scheme');
     }
-
 
     protected function storeImage()
     {
@@ -150,7 +182,13 @@ class Image extends Model
         $sources = '';
 
         foreach (array_reverse(config('genealabs-laravel-imagery.size-presets')) as $sizePreset) {
-            $image = ((new Imagery)->conjure($this->source, $sizePreset, $sizePreset, [], ['doNotCreateDerivativeImages' => true]));
+            $image = (new Imagery)->conjure(
+                $this->source,
+                $sizePreset,
+                $sizePreset,
+                [],
+                ['doNotCreateDerivativeImages' => true]
+            );
 
             if ($sizePreset < $this->width || $sizePreset < $this->height) {
                 $sources .= "<source srcset=\"{$image->url}\" media=\"(min-width: {$sizePreset}px)\">";

@@ -21,7 +21,13 @@ class RenderDerivativeImages implements ShouldQueue
     public function handle()
     {
         foreach (config('genealabs-laravel-imagery.size-presets') as $sizePreset) {
-            (new Imagery)->conjure($this->originalImageUri, $sizePreset, $sizePreset, [], ['doNotCreateDerivativeImages' => true]);
+            (new Imagery)->conjure(
+                $this->originalImageUri,
+                $sizePreset,
+                $sizePreset,
+                [],
+                ['doNotCreateDerivativeImages' => true]
+            );
         }
     }
 }

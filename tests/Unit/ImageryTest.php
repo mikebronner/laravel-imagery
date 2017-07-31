@@ -20,6 +20,7 @@ class ImageryTest extends TestCase
     public function testUrlParameterReturnsUrl()
     {
         $image = (new Imagery)->conjure(public_path('test.jpg'));
+        dd('test');
 
         $result = $image->url;
 
@@ -38,10 +39,12 @@ class ImageryTest extends TestCase
     public function testOriginalParameterFromExternalUrlReturnsLocalUrl()
     {
         $image = (new Imagery)->conjure('http://cdn.skim.gs/images/fajkx3pdvvt9ax6btssg/20-of-the-cutest-small-dog-breeds-on-the-planet');
+        $height = $image->height;
+        $width = $image->width;
 
         $result = $image->originalUrl;
 
-        $this->assertEquals('http://localhost/20-of-the-cutest-small-dog-breeds-on-the-planet', $result);
+        $this->assertEquals("http://localhost/20-of-the-cutest-small-dog-breeds-on-the-planet_{$width}x{$height}", $result);
     }
 
     public function testOriginalParameterFromExternalUrlSavesFileLocally()

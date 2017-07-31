@@ -15,6 +15,8 @@ class Imagery
             $source,
             $width,
             $height,
+            $_COOKIE['screenWidth'] ?? '',
+            $_COOKIE['screenHeight'] ?? '',
             $options->get('alwaysPreserveAspectRatio', true),
             $options->get('overrideScreenConstraint', false),
             $options->get('screenConstraintMethod', 'contain'),

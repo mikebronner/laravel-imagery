@@ -11,8 +11,7 @@
   "require": {
     "php": ">=7.0.0",
     "jenssegers/model": "^1.1",
-    "intervention/image": "^2.3",
-    "intervention/imagecache": "^2.3"
+    "intervention/image": "^2.3"
   },
   "require-dev": {
       "doctrine/dbal": "^2.5",

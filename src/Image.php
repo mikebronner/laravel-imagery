@@ -27,14 +27,13 @@ class Image extends Model
         $this->height = intval($height);
         $this->width = intval($width);
         $this->source = $source;
+        dump($source);
         $this->image = (new ImageManager)->make($source);
         $this->originalPath = public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
         $this->alwaysPreserveAspectRatio = $options->get('alwaysPreserveAspectRatio', true);
         $this->doNotCreateDerivativeImages = $options->get('doNotCreateDerivativeImages', false);
         $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
         $this->screenConstraintMethod = $options->get('screenConstraintMethod', 'contain');
-        // TODO: queue up image compression to run in background.
-
 
         if ($this->sourceIsUrl($source)) {
             $this->image->save($this->originalPath);
@@ -50,11 +49,18 @@ class Image extends Model
 
     protected function resizeImage(int $width = null, int $height = null, bool $alwaysPreserveAspect = null)
     {
-        //TODO: access cookie via Laravel, avoid superglobals.
-        $screenHeight = $_COOKIE['screenHeight'];
-        $screenWidth = $_COOKIE['screenWidth'];
+        $screenHeight = $_COOKIE['screenWidth'] ?? null;
+        $screenWidth = $_COOKIE['screenHeight'] ?? null;
+        $screenHeight = $screenWidth ? intval($screenWidth) : null;
+        $screenWidth = $screenWidth ? intval($screenWidth) : null;
         $height = $this->determineHeight($height, $screenHeight);
         $width = $this->determineWidth($width, $screenWidth);
+
+        if (! $height && ! $width) {
+            $height = $this->image->height();
+            $width = $this->image->width();
+        }
+
         $maxHeight = $this->determineMaxHeight($height, $screenHeight, $screenWidth);
         $maxWidth = $this->determineMaxWidth($width, $screenHeight, $screenWidth);
 
@@ -71,8 +77,13 @@ class Image extends Model
         $this->storeImage();
     }
 
+    //TODO: refactor to have a single return type, instead of null or int
     protected function determineMaxHeight($height, $screenHeight, $screenWidth)
     {
+        if (! $screenHeight || ! $screenWidth) {
+            return $height;
+        }
+
         $maxHeight = $height ?: $this->image->height();
 
         if (! $this->overrideScreenConstraint) {
@@ -91,8 +102,13 @@ class Image extends Model
         return $maxHeight;
     }
 
+    //TODO: refactor to have a single return type, instead of null or int
     protected function determineMaxWidth($width, $screenHeight, $screenWidth)
     {
+        if (! $screenHeight || ! $screenWidth) {
+            return $width;
+        }
+
         $maxWidth = $width ?: $this->image->width();
 
         if (! $this->overrideScreenConstraint) {
@@ -101,15 +117,16 @@ class Image extends Model
             if ($this->screenConstraintMethod === 'cover') {
                 $imageToScreenHeight = $screenHeight / $this->image->height();
                 $imageToScreenWidth = $screenWidth / $this->image->width();
-
                 if ($imageToScreenHeight > $imageToScreenWidth) {
                     $maxWidth = null;
                 }
             }
         }
+
+        return $maxWidth;
     }
 
-    protected function determineHeight($height, $screenHeight)
+    protected function determineHeight($height, $screenHeight) : int
     {
         if ($screenHeight && $height && $this->heightIsPercentage) {
             return $screenHeight * ($height / 100);
@@ -118,7 +135,7 @@ class Image extends Model
         return $height;
     }
 
-    protected function determineWidth($width, $screenWidth)
+    protected function determineWidth($width, $screenWidth) : int
     {
         if ($screenWidth && $width && $this->widthIsPercentage) {
             return $screenWidth * ($width / 100);
@@ -141,13 +158,14 @@ class Image extends Model
     {
         $pathParts = pathinfo($this->source);
         $fileName = $pathParts['filename'];
-        $extension = '.' . $pathParts['extension'];
+        $extension = $pathParts['extension'] ?? '';
+        $extension = $extension ? ".{$extension}" : '';
 
         if ($this->width || $this->height) {
             $fileName .= "_{$this->width}x{$this->height}";
         }
 
-        return "{$fileName}.{$extension}";
+        return "{$fileName}{$extension}";
     }
 
     public function getImgAttribute() : string

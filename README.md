@@ -1,4 +1,5 @@
 # Imagery for Laravel
+[![Join the chat at https://gitter.im/GeneaLabs/laravel-imagery](https://badges.gitter.im/GeneaLabs/laravel-imagery.svg)](https://gitter.im/GeneaLabs/laravel-imagery?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 **NOTE: Still under initial development, not yet functional. Initial release
  will be available in the next week or so. Stay tuned. :)**

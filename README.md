@@ -1,5 +1,11 @@
 # Imagery for Laravel
 [![Join the chat at https://gitter.im/GeneaLabs/laravel-imagery](https://badges.gitter.im/GeneaLabs/laravel-imagery.svg)](https://gitter.im/GeneaLabs/laravel-imagery?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Travis](https://img.shields.io/travis/GeneaLabs/laravel-imagery.svg)](https://travis-ci.org/GeneaLabs/laravel-imagery)
+[![SensioLabs Insight](https://img.shields.io/sensiolabs/i/ddbfb7f2-eaa1-4b10-bd15-888eefbeb000.svg)](https://insight.sensiolabs.com/projects/ddbfb7f2-eaa1-4b10-bd15-888eefbeb000/analyses/1)
+[![Scrutinizer](https://img.shields.io/scrutinizer/g/GeneaLabs/laravel-imagery.svg)](https://scrutinizer-ci.com/g/GeneaLabs/laravel-imagery)
+[![Coveralls](https://img.shields.io/coveralls/GeneaLabs/laravel-imagery.svg)](https://coveralls.io/github/GeneaLabs/laravel-imagery)
+[![GitHub (pre-)release](https://img.shields.io/github/release/GeneaLabs/laravel-imagery/all.svg)](https://github.com/GeneaLabs/laravel-imagery)
+[![Packagist](https://img.shields.io/packagist/dt/GeneaLabs/laravel-imagery.svg)](https://packagist.org/packages/genealabs/laravel-imagery)
 
 **NOTE: Still under initial development, not yet functional. Initial release
  will be available in the next week or so. Stay tuned. :)**

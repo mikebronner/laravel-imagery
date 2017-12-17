@@ -7,6 +7,20 @@ use Illuminate\Support\Collection;
 
 class Image extends Model
 {
+    protected $originalHeight;
+    protected $originalWidth;
+    // protected $htmlAttributes;
+    protected $heightIsPercentage;
+    protected $widthIsPercentage;
+    // protected $source;
+    // protected $height;
+    // protected $width;
+    // protected $originalPath;
+    protected $alwaysPreserveAspectRatio;
+    protected $doNotCreateDerivativeImages;
+    protected $overrideScreenConstraint;
+    protected $screenConstraintMethod;
+
     //TODO: this class needs serious refactoring!!!
     public function __construct(
         string $source,
@@ -17,19 +31,18 @@ class Image extends Model
     ) {
         parent::__construct();
 
-        $this->createChacheFolderIfMissing();
+        $this->createCacheFolderIfMissing();
 
         $this->originalHeight = $height;
         $this->originalWidth = $width;
         $this->htmlAttributes = $htmlAttributes;
         $this->heightIsPercentage = str_contains($height, '%');
         $this->widthIsPercentage = str_contains($width, '%');
+        $this->source = $source;
+        $this->image = (new ImageManager)->make($source);
         $this->height = intval($height);
         $this->width = intval($width);
-        $this->source = $source;
-        dump($source);
-        $this->image = (new ImageManager)->make($source);
-        $this->originalPath = public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
+        $this->originalPath = public_path(config('genealabs-laravel-imagery.storage-folder') . basename($source));
         $this->alwaysPreserveAspectRatio = $options->get('alwaysPreserveAspectRatio', true);
         $this->doNotCreateDerivativeImages = $options->get('doNotCreateDerivativeImages', false);
         $this->overrideScreenConstraint = $options->get('overrideScreenConstraint', false);
@@ -42,13 +55,18 @@ class Image extends Model
         $this->resizeImage($this->width, $this->height, $this->alwaysPreserveAspectRatio);
 
         if (! $this->doNotCreateDerivativeImages) {
-            $job = (new RenderDerivativeImages($this->originalPath))->onQueue('imagery');
+            $job = (new RenderDerivativeImages($this->source))->onQueue('imagery');
             dispatch($job);
         }
     }
 
-    protected function resizeImage(int $width = null, int $height = null, bool $alwaysPreserveAspect = null)
+    protected function resizeImage(int $width, int $height, bool $alwaysPreserveAspect = false)
     {
+        if (! $height || ! $width) {
+            $height = $height ?: $this->image->getHeight();
+            $width = $width ?: $this->image->getWidth();
+        }
+
         $screenHeight = $_COOKIE['screenWidth'] ?? null;
         $screenWidth = $_COOKIE['screenHeight'] ?? null;
         $screenHeight = $screenWidth ? intval($screenWidth) : null;
@@ -151,7 +169,8 @@ class Image extends Model
 
     protected function storeImage()
     {
-        $this->image->save(public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName));
+        $this->image
+            ->save(public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName));
     }
 
     public function getFileNameAttribute() : string
@@ -185,12 +204,12 @@ class Image extends Model
 
     public function getOriginalUrlAttribute() : string
     {
-        return asset(config('storage-folder') . $this->fileName);
+        return asset(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
     }
 
     public function getPathAttribute() : string
     {
-        return public_path(config('storage-folder') . $this->fileName);
+        return public_path(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
     }
 
     public function getPictureAttribute() : string
@@ -227,7 +246,7 @@ class Image extends Model
         return asset(config('genealabs-laravel-imagery.storage-folder') . $this->fileName);
     }
 
-    protected function createChacheFolderIfMissing()
+    protected function createCacheFolderIfMissing()
     {
         app('filesystem')->disk('public')->makeDirectory(config('genealabs-laravel-imagery.storage-folder'));
 

@@ -9,13 +9,13 @@ class Image extends Model
 {
     protected $originalHeight;
     protected $originalWidth;
-    protected $htmlAttributes;
+    // protected $htmlAttributes;
     protected $heightIsPercentage;
     protected $widthIsPercentage;
-    protected $source;
-    protected $height;
-    protected $width;
-    protected $originalPath;
+    // protected $source;
+    // protected $height;
+    // protected $width;
+    // protected $originalPath;
     protected $alwaysPreserveAspectRatio;
     protected $doNotCreateDerivativeImages;
     protected $overrideScreenConstraint;

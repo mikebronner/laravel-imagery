@@ -15,23 +15,14 @@ class ImageryTest extends TestCase
         $result = $image->url;
 
         $this->assertInternalType('string', $result);
-    }
-
-    public function testUrlParameterReturnsUrl()
-    {
-        $image = (new Imagery)->conjure(public_path('test.jpg'));
-        dd('test');
-
-        $result = $image->url;
-
-        $this->assertEquals('http://localhost/test.jpg', $result);
+        $this->assertEquals('http://localhost/imagery-cache/test_500x375.jpg', $result);
     }
 
     public function testOriginalParameterReturnsFilePath()
     {
         $image = (new Imagery)->conjure(public_path('test.jpg'));
 
-        $result = $image->originalPath;
+        $result = $image->source;
 
         $this->assertContains('/public/test.jpg', $result);
     }
@@ -44,7 +35,7 @@ class ImageryTest extends TestCase
 
         $result = $image->originalUrl;
 
-        $this->assertEquals("http://localhost/20-of-the-cutest-small-dog-breeds-on-the-planet_{$width}x{$height}", $result);
+        $this->assertEquals("http://localhost/imagery-cache/20-of-the-cutest-small-dog-breeds-on-the-planet_{$width}x{$height}", $result);
     }
 
     public function testOriginalParameterFromExternalUrlSavesFileLocally()
@@ -64,7 +55,7 @@ class ImageryTest extends TestCase
         $conjuredImage = (new Imagery)->conjure('http://cdn.skim.gs/images/fajkx3pdvvt9ax6btssg/20-of-the-cutest-small-dog-breeds-on-the-planet', $width);
         $directImage = (new ImageManager)->make($conjuredImage->path);
 
-        $this->assertEquals('http://localhost/20-of-the-cutest-small-dog-breeds-on-the-planet_200x133', $conjuredImage->url);
+        $this->assertEquals('http://localhost/imagery-cache/20-of-the-cutest-small-dog-breeds-on-the-planet_200x133', $conjuredImage->url);
         $this->assertEquals($width, $directImage->width());
         $this->assertEquals($height, $directImage->height());
     }

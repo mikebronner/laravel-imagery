@@ -7,6 +7,20 @@ use Illuminate\Support\Collection;
 
 class Image extends Model
 {
+    protected $originalHeight;
+    protected $originalWidth;
+    protected $htmlAttributes;
+    protected $heightIsPercentage;
+    protected $widthIsPercentage;
+    protected $source;
+    protected $height;
+    protected $width;
+    protected $originalPath;
+    protected $alwaysPreserveAspectRatio;
+    protected $doNotCreateDerivativeImages;
+    protected $overrideScreenConstraint;
+    protected $screenConstraintMethod;
+
     //TODO: this class needs serious refactoring!!!
     public function __construct(
         string $source,

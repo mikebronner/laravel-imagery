@@ -6,6 +6,7 @@
 [![Coveralls](https://img.shields.io/coveralls/GeneaLabs/laravel-imagery.svg)](https://coveralls.io/github/GeneaLabs/laravel-imagery)
 [![GitHub (pre-)release](https://img.shields.io/github/release/GeneaLabs/laravel-imagery/all.svg)](https://github.com/GeneaLabs/laravel-imagery)
 [![Packagist](https://img.shields.io/packagist/dt/GeneaLabs/laravel-imagery.svg)](https://packagist.org/packages/genealabs/laravel-imagery)
+
 **NOTE: Still under initial development, not yet functional. Initial release
  will be available in the next week or so. Stay tuned. :)**
 

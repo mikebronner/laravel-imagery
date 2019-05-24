@@ -25,7 +25,7 @@
       "phpunit/phpunit": "*",
       "sebastian/phpcpd": "*",
       "squizlabs/php_codesniffer": "*",
-      "symfony/css-selector": "3.2.*",
+      "symfony/css-selector": "4.2.*",
       "symfony/dom-crawler": "3.2.*"
   },
   "autoload": {

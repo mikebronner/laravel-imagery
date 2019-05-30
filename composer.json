@@ -26,7 +26,7 @@
       "sebastian/phpcpd": "*",
       "squizlabs/php_codesniffer": "*",
       "symfony/css-selector": "3.2.*",
-      "symfony/dom-crawler": "3.2.*"
+      "symfony/dom-crawler": "4.3.*"
   },
   "autoload": {
     "classmap": [

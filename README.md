@@ -1,4 +1,7 @@
 # Imagery for Laravel
+
+![Imagery for Laravel masthead image.](https://repository-images.githubusercontent.com/93322764/8faaac00-f349-11e9-9b4d-89244bed67ab)
+
 [![Join the chat at https://gitter.im/GeneaLabs/laravel-imagery](https://badges.gitter.im/GeneaLabs/laravel-imagery.svg)](https://gitter.im/GeneaLabs/laravel-imagery?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Travis](https://img.shields.io/travis/GeneaLabs/laravel-imagery.svg)](https://travis-ci.org/GeneaLabs/laravel-imagery)
 [![SensioLabs Insight](https://img.shields.io/sensiolabs/i/ddbfb7f2-eaa1-4b10-bd15-888eefbeb000.svg)](https://insight.sensiolabs.com/projects/ddbfb7f2-eaa1-4b10-bd15-888eefbeb000/analyses/1)
